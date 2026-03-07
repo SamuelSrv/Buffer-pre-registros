@@ -257,3 +257,39 @@ function exportToCSV() {
 
 // Inicializa a tabela
 renderTable();
+
+// --- LÓGICA DO RODAPÉ (VERSÍCULOS) ---
+const versiculos = [
+    '"Tudo posso naquele que me fortalece." - Filipenses 4:13',
+    '"O Senhor é o meu pastor; nada me faltará." - Salmos 23:1',
+    '"Ainda que eu ande pelo vale da sombra da morte, não temerei mal algum, porque tu estás comigo." - Salmos 23:4',
+    '"Entrega o teu caminho ao Senhor; confia nele, e ele o fará." - Salmos 37:5',
+    '"Mas os que esperam no Senhor renovarão as suas forças." - Isaías 40:31',
+    '"Não fui eu que ordenei a você? Seja forte e corajoso! Não se apavore nem desanime, pois o Senhor, o seu Deus, estará com você por onde você andar." - Josué 1:9'
+];
+
+function atualizarVersiculo() {
+    const verseElement = document.getElementById('bible-verse');
+    const agora = Date.now();
+    const duasHorasEmMilisegundos = 2 * 60 * 60 * 1000; // 2 horas de trava
+    
+    // Busca na memória do navegador se já tem um versículo salvo e a validade dele
+    let versiculoSalvo = localStorage.getItem('currentVerse');
+    let validade = localStorage.getItem('verseExpiration');
+
+    // Se não tiver versículo, ou se a validade (2h) já expirou, sorteia um novo
+    if (!versiculoSalvo || !validade || agora > validade) {
+        const randomIndex = Math.floor(Math.random() * versiculos.length);
+        versiculoSalvo = versiculos[randomIndex];
+        
+        // Salva o novo versículo e define a próxima troca para daqui a 2 horas
+        localStorage.setItem('currentVerse', versiculoSalvo);
+        localStorage.setItem('verseExpiration', agora + duasHorasEmMilisegundos);
+    }
+
+    // Escreve na tela
+    verseElement.innerText = versiculoSalvo;
+}
+
+// Inicia a função assim que a página carrega
+atualizarVersiculo();

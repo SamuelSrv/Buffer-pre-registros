@@ -117,3 +117,26 @@ body.dark-mode .status-ok { background-color: #143d20; color: #75b798; }
 .btn-delete { background-color: var(--danger-color); }
 .registrado td { opacity: 0.5; }
 .registrado .problema-cell { text-decoration: line-through; }
+
+/* --- RODAPÉ --- */
+.app-footer {
+    text-align: center;
+    padding: 20px 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: #888;
+    font-size: 12px;
+}
+body.dark-mode .app-footer {
+    color: #666;
+}
+.verse-text {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+body.dark-mode .verse-text {
+    color: #a5d6a7;
+}
