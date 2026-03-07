@@ -1,0 +1,8 @@
+{
+  "name": "buffer-lebes",
+  "version": "1.0.0",
+  "description": "Buffer de Atendimentos TI",
+  "dependencies": {
+    "@google/generative-ai": "^0.1.1"
+  }
+}

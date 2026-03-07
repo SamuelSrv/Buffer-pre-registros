@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buffer de Atendimentos | Lebes</title>
+    
+    <link rel="icon" type="image/png" href="img/logo.png">
+    
+    <style>
+        :root {
+            --primary-color: #006837; 
+            --primary-dark: #004d29;
+            --accent-color: #f39c12; 
+            --success-color: #27ae60; 
+            --danger-color: #c0392b; 
+            
+            --bg-light: #f4f7f6;
+            --text-dark: #333;
+            --border-color: #e0e0e0;
+            --bg-card: #fff;
+            --bg-form: #f9fbfd;
+            --table-even: #f8f9fa;
+            --table-hover: #e9ecef;
+            --input-bg: #fff;
+        }
+
+        body.dark-mode {
+            --bg-light: #121212;
+            --text-dark: #e0e0e0;
+            --border-color: #333333;
+            --bg-card: #1e1e1e;
+            --bg-form: #252525;
+            --table-even: #2a2a2a;
+            --table-hover: #333333;
+            --input-bg: #2d2d2d;
+        }
+
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-light); margin: 0; padding: 0; color: var(--text-dark); transition: background-color 0.3s, color 0.3s; }
+        
+        .app-header { background-color: var(--primary-color); padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between; }
+        
+        .header-left { display: flex; align-items: center; gap: 30px; }
+        .app-logo { height: 40px; width: auto; }
+        
+        .top-nav { display: flex; gap: 10px; }
+        .nav-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s; cursor: pointer; }
+        .nav-btn:hover { background: rgba(255,255,255,0.25); }
+        .nav-btn.active { background: white; color: var(--primary-color); border-color: white; }
+
+        #themeToggle { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: all 0.2s; padding: 0; }
+        #themeToggle:hover { background: rgba(255,255,255,0.1); border-color: white; transform: scale(1.05); }
+
+        .main-container { max-width: 1100px; margin: 30px auto; background: var(--bg-card); padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); transition: background-color 0.3s; }
+        
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; }
+        h2 { margin: 0; color: var(--primary-color); font-weight: 600; font-size: 1.5rem; }
+
+        /* Área de Aprimoramento */
+        .ai-container { display: flex; flex-direction: column; gap: 20px; }
+        .ai-box { display: flex; flex-direction: column; gap: 10px; }
+        .ai-box label { font-weight: 600; color: var(--primary-color); font-size: 14px; }
+        textarea { width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background-color: var(--input-bg); color: var(--text-dark); resize: vertical; font-family: inherit; line-height: 1.5; }
+        textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(0, 104, 55, 0.1); }
+        
+        .btn-ai-generate { background-color: var(--primary-color); color: white; padding: 12px 25px; font-size: 15px; border-radius: 6px; align-self: flex-start; cursor: pointer; border: none; font-weight: bold;}
+        .btn-ai-generate:hover { background-color: var(--primary-dark); }
+
+        /* Componentes do Buffer */
+        .shortcuts-bar { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; padding: 0 5px; }
+        .shortcut-label { font-size: 13px; font-weight: 700; color: var(--primary-color); }
+        .btn-shortcut { background-color: #e8f5e9; color: var(--primary-dark); border: 1px solid #c8e6c9; border-radius: 20px; padding: 6px 14px; font-size: 12px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-shortcut:hover { background-color: var(--primary-color); color: white; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        body.dark-mode .btn-shortcut { background-color: #1a3c28; color: #a5d6a7; border-color: #2e7d32; }
+
+        .form-group { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-start; background-color: var(--bg-form); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .input-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+        .input-group label { font-size: 12px; font-weight: 600; color: var(--primary-color); margin-left: 2px; }
+        
+        input, select { padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; background-color: var(--input-bg); color: var(--text-dark); }
+        input[type="text"] { min-width: 65px; }
+        .input-filial-group { flex: none !important; width: 100px; }
+        .input-origem-group { flex: none !important; width: 120px; } 
+        
+        button { cursor: pointer; font-weight: 600; border: none; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        #btnSalvar { background-color: var(--primary-color); color: white; padding: 12px 25px; font-size: 15px; align-self: flex-end; height: 45px; margin-top: auto; border-radius: 6px; }
+        
+        .btn-exportar { background-color: transparent; color: #2980b9; border: 2px solid #2980b9; font-size: 13px; padding: 8px 15px; border-radius: 6px; }
+        .btn-limpar-tudo { background-color: transparent; color: var(--danger-color); border: 2px solid var(--danger-color); font-size: 13px; padding: 8px 15px; border-radius: 6px; }
+
+        .dashboard-stats { display: flex; gap: 15px; margin-bottom: 20px; padding: 10px 0; }
+        .stat-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid var(--primary-color); border-radius: 6px; padding: 10px 20px; display: flex; flex-direction: column; min-width: 120px; }
+        .stat-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; margin-bottom: 5px; }
+        .stat-value { font-size: 20px; font-weight: 700; color: var(--primary-color); }
+        .stat-chat { border-left-color: #3498db; }
+        .stat-chat .stat-value { color: #3498db; }
+        .stat-fone { border-left-color: #e67e22; }
+        .stat-fone .stat-value { color: #e67e22; }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        th { background-color: var(--primary-color); color: white; padding: 15px; text-align: left; font-weight: 600; }
+        td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+        tbody tr:nth-child(even) { background-color: var(--table-even); }
+        tbody tr:hover { background-color: var(--table-hover); }
+
+        /* Edição em Linha Restaurada */
+        .editable-cell { transition: background-color 0.2s, outline 0.2s; border-radius: 4px; min-height: 20px; }
+        .editable-cell:hover { background-color: rgba(128, 128, 128, 0.1); cursor: text; }
+        .editable-cell:focus { background-color: var(--input-bg); outline: 2px solid var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .status-pendente { background-color: #fff3cd; color: #856404; }
+        .status-ok { background-color: #d4edda; color: #155724; }
+        body.dark-mode .status-pendente { background-color: #4a3c13; color: #ffda6a; }
+        body.dark-mode .status-ok { background-color: #143d20; color: #75b798; }
+
+        .actions-cell { display: flex; gap: 8px; }
+        .btn-action { padding: 6px 10px; font-size: 12px; border-radius: 4px; color: white; border: none; }
+        .btn-action:active { transform: scale(0.95); }
+        .btn-copy { background-color: var(--accent-color); }
+        .btn-ok { background-color: var(--success-color); }
+        .btn-delete { background-color: var(--danger-color); }
+        .registrado td { opacity: 0.5; }
+        .registrado .problema-cell { text-decoration: line-through; }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-left">
+        <img src="https://intranet.lebes.com.br/wp-content/uploads/2025/10/Logotipo_Preferencial_BRANCO-1-2048x428.png" alt="Lebes Logo" class="app-logo">
+        <nav class="top-nav">
+            <button class="nav-btn active" onclick="switchTab('buffer')">📋 Buffer</button>
+            <button class="nav-btn" onclick="switchTab('aprimorar')">✨ Aprimorar Textos</button>
+        </nav>
+    </div>
+    <button id="themeToggle" title="Alternar Tema">🌙</button>
+</header>
+
+<div class="main-container">
+
+    <section id="buffer" class="page-section active">
+        <div class="header-actions">
+            <h2>Buffer de Atendimentos</h2>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-exportar" onclick="exportToCSV()" title="Baixar histórico em Excel">
+                    <span style="margin-right: 8px;">📊</span> Exportar Backup
+                </button>
+                <button class="btn-limpar-tudo" onclick="clearAll()">
+                    <span style="margin-right: 8px;">🗑️</span> Limpar Dia
+                </button>
+            </div>
+        </div>
+        
+        <div class="shortcuts-bar">
+            <span class="shortcut-label">⚡ Templates:</span>
+            <button type="button" class="btn-shortcut" onclick="applyTemplate('Loja entrou em contato informando PDV Travado.', 'Foi necessário reconfigurar PDV via linha de comando (config.sh). Equipamento voltou a funcionar normalmente.')">PDV Travado</button>
+            <button type="button" class="btn-shortcut" onclick="applyTemplate('Loja entrou em contato informando que todos os PDVs estão com erro ao resgatar vendas.', 'Ajustado ao iniciar serviço responsável pelo resgate no servidor da loja. Resgates normalizados.')">Erro Resgate</button>
+            <button type="button" class="btn-shortcut" onclick="applyTemplate('Todas as pré vendas com erro de conexão com as bases', 'Ajustado ao acessar servidor da loja e reiniciar bases. Acesso normalizado em todas as pré vendas')">Erro Conexão PV</button>
+            <button type="button" class="btn-shortcut" onclick="applyTemplate('Loja entrou em contato solicitando senha de acesso ao Portal Nexoh', 'Loja encaminhada ao time de NOC para ajuste')">Senha Nexoh</button>
+            <button type="button" class="btn-shortcut" onclick="applyTemplate('Contato referente a instabilidade no pagamento via PIX.', 'Loja orientada sobre a instabilidade geral. Solicitado clicar em \'Voltar\' para estornar o valor e aguardar a correção. Em caso de falha no estorno, a orientação é acionar o time do Financeiro diretamente.')">Instabilidade PIX</button>
+        </div>
+
+
+        <form id="ticketForm" class="form-group">
+            <div class="input-group input-filial-group">
+                <label for="filial">Filial</label>
+                <input type="text" id="filial" placeholder="Ex: 247" maxlength="3" pattern="\d*" required autofocus>
+            </div>
+            <div class="input-group input-origem-group">
+                <label for="acionamento">Origem</label>
+                <select id="acionamento" required>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Telefone">Telefone</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="problema">Problema Relatado</label>
+                <input type="text" id="problema" placeholder="Descreva o problema..." required>
+            </div>
+            <div class="input-group">
+                <label for="solucao">Solução Aplicada</label>
+                <input type="text" id="solucao" placeholder="O que foi feito...">
+            </div>
+            <div class="input-group input-filial-group">
+                 <label for="pdv">PDV</label>
+                <input type="text" id="pdv" placeholder="Nº">
+            </div>
+            <button type="submit" id="btnSalvar">Salvar (Enter)</button>
+        </form>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <span class="stat-title">Total</span>
+                <span class="stat-value" id="countTotal">0</span>
+            </div>
+            <div class="stat-card stat-chat">
+                <span class="stat-title">WhatsApp</span>
+                <span class="stat-value" id="countChat">0</span>
+            </div>
+            <div class="stat-card stat-fone">
+                <span class="stat-title">Telefone</span>
+                <span class="stat-value" id="countFone">0</span>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Filial</th>
+                    <th style="width: 105px;">Origem</th> 
+                    <th>Problema <span style="font-size: 10px; font-weight: normal;">(Editável)</span></th>
+                    <th>Solução <span style="font-size: 10px; font-weight: normal;">(Editável)</span></th>
+                    <th style="width: 80px;">PDV <span style="font-size: 10px; font-weight: normal;">(Editável)</span></th>
+                    <th style="width: 120px; text-align: center;">Status</th>
+                    <th style="width: 160px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </section>
+
+    <section id="aprimorar" class="page-section">
+        <div class="header-actions">
+            <h2>Aprimoramento de Comunicação</h2>
+        </div>
+        
+        <div class="ai-container">
+            <div class="ai-box">
+                <label for="draftInput">Seu Rascunho Bruto:</label>
+                <textarea id="draftInput" rows="4" placeholder="Ex: ola em anexo segunda via de contrato como solicitado."></textarea>
+            </div>
+            
+            <button class="btn-ai-generate" onclick="formatarRegistro()">
+                <span style="margin-right: 5px;">🚧</span> Aplicar Padrão (Em Breve)
+            </button>
+
+            <div class="ai-box">
+                <label for="finalOutput">Resultado Aprimorado (Pronto para envio):</label>
+                <textarea id="finalOutput" rows="7" readonly placeholder="O resultado aparecerá aqui..."></textarea>
+            </div>
+
+            <button class="btn-copy" id="btnCopyAi" style="align-self: flex-start; padding: 10px 20px; font-size: 14px; border-radius: 6px;" onclick="copiarAprimorado()">Copiar Texto</button>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // NAVEGAÇÃO
+    function switchTab(tabId) {
+        document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // TRAVA DE SEGURANÇA IA
+    function formatarRegistro() {
+        const outputField = document.getElementById('finalOutput');
+        outputField.value = "🚧 Funcionalidade em manutenção.\n\nA integração com o motor de Inteligência Artificial está sendo configurada no servidor e estará disponível em breve.\n\nPor favor, continue utilizando a aba 'Buffer' para os seus registros diários.";
+    }
+
+    function copiarAprimorado() {
+        const texto = document.getElementById('finalOutput').value;
+        if (!texto || texto.includes("manutenção")) return;
+        navigator.clipboard.writeText(texto);
+    }
+
+    // LÓGICA BUFFER
+    const form = document.getElementById('ticketForm');
+    const tableBody = document.getElementById('tableBody');
+    let tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+
+    const themeToggle = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggle.innerText = '☀️';
+    }
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        let theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        themeToggle.innerText = theme === 'dark' ? '☀️' : '🌙';
+        localStorage.setItem('theme', theme);
+    });
+
+    const enterSequence = ['filial', 'problema', 'solucao', 'pdv', 'btnSalvar'];
+    form.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const currentId = document.activeElement.id;
+            const currentIndex = enterSequence.indexOf(currentId);
+            if (currentIndex !== -1) {
+                if (currentIndex === enterSequence.length - 1) form.dispatchEvent(new Event('submit'));
+                else document.getElementById(enterSequence[currentIndex + 1]).focus();
+            }
+        }
+    });
+
+    function applyTemplate(problemaText, solucaoText) {
+        document.getElementById('problema').value = problemaText;
+        document.getElementById('solucao').value = solucaoText;
+        const bgColor = document.body.classList.contains('dark-mode') ? '#1a3c28' : '#d4edda';
+        document.getElementById('problema').style.backgroundColor = bgColor;
+        document.getElementById('solucao').style.backgroundColor = bgColor;
+        setTimeout(() => {
+            document.getElementById('problema').style.backgroundColor = '';
+            document.getElementById('solucao').style.backgroundColor = '';
+        }, 400);
+        document.getElementById('filial').focus();
+    }
+
+    function updateDashboard() {
+        document.getElementById('countTotal').innerText = tickets.length;
+        document.getElementById('countChat').innerText = tickets.filter(t => t.acionamento === 'WhatsApp').length;
+        document.getElementById('countFone').innerText = tickets.filter(t => t.acionamento === 'Telefone').length;
+    }
+
+    function renderTable() {
+        tableBody.innerHTML = '';
+        tickets.forEach((ticket, index) => {
+            const tr = document.createElement('tr');
+            if (ticket.registrado) tr.classList.add('registrado');
+            const statusBadge = ticket.registrado ? '<span class="status-badge status-ok">OK</span>' : '<span class="status-badge status-pendente">Pendente</span>';
+            
+            // Colunas Editáveis Restauradas
+            tr.innerHTML = `
+                <td style="font-weight: bold;">${ticket.filial}</td>
+                <td>${ticket.acionamento}</td>
+                <td class="editable-cell problema-cell" data-index="${index}" data-field="problema" contenteditable="true" title="Clique para editar">${ticket.problema}</td>
+                <td class="editable-cell" data-index="${index}" data-field="solucao" contenteditable="true" title="Clique para editar">${ticket.solucao || ''}</td>
+                <td class="editable-cell" data-index="${index}" data-field="pdv" contenteditable="true" title="Clique para editar">${ticket.pdv || ''}</td>
+                <td style="text-align: center;">${statusBadge}</td>
+                <td class="actions-cell">
+                    <button class="btn-action btn-copy" onclick="copyToClipboard(${index})">Copiar</button>
+                    <button class="btn-action btn-ok" onclick="toggleStatus(${index})">✓</button>
+                    <button class="btn-action btn-delete" onclick="deleteTicket(${index})">✕</button>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+        updateDashboard(); 
+    }
+
+    // Eventos de Salvamento da Edição em Linha Restaurados
+    tableBody.addEventListener('focusout', function(e) {
+        if(e.target.classList.contains('editable-cell')) {
+            const index = e.target.getAttribute('data-index');
+            const field = e.target.getAttribute('data-field');
+            const newValue = e.target.innerText.trim(); 
+            
+            if(tickets[index][field] !== newValue) {
+                tickets[index][field] = newValue;
+                localStorage.setItem('tickets', JSON.stringify(tickets));
+            }
+        }
+    });
+
+    tableBody.addEventListener('keydown', function(e) {
+        if(e.target.classList.contains('editable-cell') && e.key === 'Enter') {
+            e.preventDefault(); 
+            e.target.blur(); 
+            
+            const originalBg = e.target.style.backgroundColor;
+            e.target.style.backgroundColor = document.body.classList.contains('dark-mode') ? '#1a3c28' : '#d4edda'; 
+            setTimeout(() => {
+                e.target.style.backgroundColor = originalBg;
+                renderTable(); 
+            }, 300);
+        }
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        tickets.unshift({
+            filial: document.getElementById('filial').value,
+            acionamento: document.getElementById('acionamento').value,
+            pdv: document.getElementById('pdv').value,
+            problema: document.getElementById('problema').value,
+            solucao: document.getElementById('solucao').value,
+            registrado: false
+        });
+        localStorage.setItem('tickets', JSON.stringify(tickets));
+        renderTable();
+        form.reset();
+        document.getElementById('filial').focus();
+    });
+
+    function copyToClipboard(index) {
+        const t = tickets[index];
+        let parts = [`[Filial: ${t.filial}]`, `Origem: ${t.acionamento}`];
+        if (t.pdv && t.pdv.trim() !== '') parts.push(`PDV: ${t.pdv.trim()}`);
+        parts.push(`Problema: ${t.problema.trim()}`);
+        if (t.solucao && t.solucao.trim() !== '') parts.push(`Solução: ${t.solucao.trim()}`);
+        
+        navigator.clipboard.writeText("Atendimento - " + parts.join(' | ')).then(() => {
+            const btn = document.querySelectorAll('.btn-copy')[index];
+            const originalText = btn.innerText;
+            btn.innerText = 'Copiado!';
+            btn.style.backgroundColor = '#27ae60';
+            setTimeout(() => { btn.innerText = originalText; btn.style.backgroundColor = ''; }, 1500);
+        });
+    }
+
+    function toggleStatus(index) {
+        tickets[index].registrado = !tickets[index].registrado;
+        localStorage.setItem('tickets', JSON.stringify(tickets));
+        renderTable();
+    }
+
+    function deleteTicket(index) {
+        if(confirm('Tem certeza que deseja excluir este rascunho?')) {
+            tickets.splice(index, 1);
+            localStorage.setItem('tickets', JSON.stringify(tickets));
+            renderTable();
+        }
+    }
+
+    function clearAll() {
+        if(tickets.length === 0) return alert("Não há registros para limpar.");
+        if (confirm("ATENÇÃO: Isso vai apagar TODOS os registros desta tela.\n\nTem certeza?") && confirm("Última confirmação: Você já passou todos esses chamados para o sistema oficial da empresa?")) {
+            tickets = [];
+            localStorage.removeItem('tickets');
+            renderTable();
+        }
+    }
+
+    function exportToCSV() {
+        if (tickets.length === 0) return alert("Não existem registos para exportar.");
+        const csvRows = ['Filial;Origem;Problema;Solução;PDV;Status'];
+        tickets.forEach(t => {
+            csvRows.push([
+                `"${t.filial}"`, `"${t.acionamento}"`, `"${(t.problema || '').replace(/"/g, '""')}"`,
+                `"${(t.solucao || '').replace(/"/g, '""')}"`, `"${(t.pdv || '').replace(/"/g, '""')}"`, `"${t.registrado ? 'OK' : 'Pendente'}"`
+            ].join(';'));
+        });
+        const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `backup_atendimentos_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    renderTable();
+</script>
+</body>
+</html>
