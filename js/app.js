@@ -11,7 +11,7 @@ async function formatarRegistro() {
     const btnGenerate = document.querySelector('.btn-ai-generate');
     const outputField = document.getElementById('finalOutput');
     let rascunho = document.getElementById('draftInput').value.trim();
-    
+
     if (!rascunho) return alert("Cole um texto no rascunho primeiro.");
 
     btnGenerate.disabled = true;
@@ -23,7 +23,7 @@ async function formatarRegistro() {
     const hora = agora.getHours();
     const minutos = agora.getMinutes();
     const tempoDecimal = hora + (minutos / 100);
-    
+
     let saudacao = "Boa noite,";
     if (tempoDecimal >= 7.00 && tempoDecimal <= 12.00) saudacao = "Bom dia,";
     else if (tempoDecimal > 12.00 && tempoDecimal <= 19.00) saudacao = "Boa tarde,";
@@ -67,7 +67,7 @@ async function formatarRegistro() {
 function copiarAprimorado() {
     const texto = document.getElementById('finalOutput').value;
     if (!texto || texto.startsWith("ERRO") || texto.startsWith("Aguarde")) return;
-    
+
     navigator.clipboard.writeText(texto).then(() => {
         const btn = document.getElementById('btnCopyAi');
         const originalText = btn.innerHTML;
@@ -99,7 +99,7 @@ themeToggle.addEventListener('click', () => {
 });
 
 const enterSequence = ['filial', 'problema', 'solucao', 'pdv', 'btnSalvar'];
-form.addEventListener('keydown', function(e) {
+form.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') {
         e.preventDefault();
         const currentId = document.activeElement.id;
@@ -136,7 +136,7 @@ function renderTable() {
         const tr = document.createElement('tr');
         if (ticket.registrado) tr.classList.add('registrado');
         const statusBadge = ticket.registrado ? '<span class="status-badge status-ok">OK</span>' : '<span class="status-badge status-pendente">Pendente</span>';
-        
+
         tr.innerHTML = `
             <td style="font-weight: bold;">${ticket.filial}</td>
             <td>${ticket.acionamento}</td>
@@ -152,32 +152,32 @@ function renderTable() {
         `;
         tableBody.appendChild(tr);
     });
-    updateDashboard(); 
+    updateDashboard();
 }
 
-tableBody.addEventListener('focusout', function(e) {
-    if(e.target.classList.contains('editable-cell')) {
+tableBody.addEventListener('focusout', function (e) {
+    if (e.target.classList.contains('editable-cell')) {
         const index = e.target.getAttribute('data-index');
         const field = e.target.getAttribute('data-field');
-        const newValue = e.target.innerText.trim(); 
-        
-        if(tickets[index][field] !== newValue) {
+        const newValue = e.target.innerText.trim();
+
+        if (tickets[index][field] !== newValue) {
             tickets[index][field] = newValue;
             localStorage.setItem('tickets', JSON.stringify(tickets));
         }
     }
 });
 
-tableBody.addEventListener('keydown', function(e) {
-    if(e.target.classList.contains('editable-cell') && e.key === 'Enter') {
-        e.preventDefault(); 
-        e.target.blur(); 
-        
+tableBody.addEventListener('keydown', function (e) {
+    if (e.target.classList.contains('editable-cell') && e.key === 'Enter') {
+        e.preventDefault();
+        e.target.blur();
+
         const originalBg = e.target.style.backgroundColor;
-        e.target.style.backgroundColor = document.body.classList.contains('dark-mode') ? '#1a3c28' : '#d4edda'; 
+        e.target.style.backgroundColor = document.body.classList.contains('dark-mode') ? '#1a3c28' : '#d4edda';
         setTimeout(() => {
             e.target.style.backgroundColor = originalBg;
-            renderTable(); 
+            renderTable();
         }, 300);
     }
 });
@@ -204,7 +204,7 @@ function copyToClipboard(index) {
     if (t.pdv && t.pdv.trim() !== '') parts.push(`PDV: ${t.pdv.trim()}`);
     parts.push(`Problema: ${t.problema.trim()}`);
     if (t.solucao && t.solucao.trim() !== '') parts.push(`Solução: ${t.solucao.trim()}`);
-    
+
     navigator.clipboard.writeText("Atendimento - " + parts.join(' | ')).then(() => {
         const btn = document.querySelectorAll('.btn-copy')[index];
         const originalText = btn.innerText;
@@ -221,7 +221,7 @@ function toggleStatus(index) {
 }
 
 function deleteTicket(index) {
-    if(confirm('Tem certeza que deseja excluir este rascunho?')) {
+    if (confirm('Tem certeza que deseja excluir este rascunho?')) {
         tickets.splice(index, 1);
         localStorage.setItem('tickets', JSON.stringify(tickets));
         renderTable();
@@ -229,7 +229,7 @@ function deleteTicket(index) {
 }
 
 function clearAll() {
-    if(tickets.length === 0) return alert("Não há registros para limpar.");
+    if (tickets.length === 0) return alert("Não há registros para limpar.");
     if (confirm("ATENÇÃO: Isso vai apagar TODOS os registros desta tela.\n\nTem certeza?") && confirm("Última confirmação: Você já passou todos esses chamados para o sistema oficial da empresa?")) {
         tickets = [];
         localStorage.removeItem('tickets');
@@ -264,7 +264,19 @@ const versiculos = [
     '"O Senhor é o meu pastor; nada me faltará." - Salmos 23:1',
     '"Ainda que eu ande pelo vale da sombra da morte, não temerei mal algum, porque tu estás comigo." - Salmos 23:4',
     '"Entrega o teu caminho ao Senhor; confia nele, e ele o fará." - Salmos 37:5',
+    '"O choro pode durar uma noite, mas a alegria vem pela manhã." - Salmos 30:5',
     '"Mas os que esperam no Senhor renovarão as suas forças." - Isaías 40:31',
+    '"Assim, permanecem agora estes três: a fé, a esperança e o amor. O maior deles, porém, é o amor" - Isaías 40:31',
+    '"Quem não ama não conhece a Deus, porque Deus é amor." - 1 João 4:8',
+    '"Dou graças a Cristo Jesus, nosso Senhor, que me deu forças e me considerou fiel, designando-me para o ministério" - 1 Timóteo 1:12',
+    '"Busquem, pois, em primeiro lugar o Reino de Deus e a sua justiça, e todas essas coisas serão acrescentadas a vocês." - Mateus 6:33',
+    '"Tão certo como eu vivo, diz o Senhor, toda joelho se dobrará diante de mim; toda língua confessará a Deus   " - Isaías 45:23',
+    '"Não vivam como vivem as pessoas deste mundo, mas deixem que Deus os transforme por meio de uma completa mudança da mente de vocês. Assim vocês conhecerão a vontade de Deus, isto é, aquilo que é bom, perfeito e agradável a ele" - Romanos 12:2',
+    '"Quem não ama não conhece a Deus, porque Deus é amor." - 1 João 4:8',
+    '"Mil poderão cair ao teu lado, e dez mil à tua direita, mas tu não serás atingido" - Salmos 91:7',
+    '"Eu sou o caminho, a verdade e a vida; ninguém vem ao Pai senão por mim" - João 14:6',
+    '"No mundo tereis aflições, mas tende bom ânimo; eu venci o mundo" - João 16:33',
+    '"Lancem sobre Ele toda a sua ansiedade, porque ele tem cuidado de vocês" - 1 Pedro 5:7',
     '"Não fui eu que ordenei a você? Seja forte e corajoso! Não se apavore nem desanime, pois o Senhor, o seu Deus, estará com você por onde você andar." - Josué 1:9'
 ];
 
@@ -272,7 +284,7 @@ function atualizarVersiculo() {
     const verseElement = document.getElementById('bible-verse');
     const agora = Date.now();
     const duasHorasEmMilisegundos = 2 * 60 * 60 * 1000; // 2 horas de trava
-    
+
     // Busca na memória do navegador se já tem um versículo salvo e a validade dele
     let versiculoSalvo = localStorage.getItem('currentVerse');
     let validade = localStorage.getItem('verseExpiration');
@@ -281,7 +293,7 @@ function atualizarVersiculo() {
     if (!versiculoSalvo || !validade || agora > validade) {
         const randomIndex = Math.floor(Math.random() * versiculos.length);
         versiculoSalvo = versiculos[randomIndex];
-        
+
         // Salva o novo versículo e define a próxima troca para daqui a 2 horas
         localStorage.setItem('currentVerse', versiculoSalvo);
         localStorage.setItem('verseExpiration', agora + duasHorasEmMilisegundos);
