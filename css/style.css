@@ -98,6 +98,32 @@ td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); vertical-
 tbody tr:nth-child(even) { background-color: var(--table-even); }
 tbody tr:hover { background-color: var(--table-hover); }
 
+.template-dropdown {
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--input-bg);
+    color: var(--text-dark);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    min-width: 250px;
+}
+.template-dropdown:hover {
+    border-color: var(--primary-color);
+}
+.template-dropdown:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 104, 55, 0.1);
+}
+body.dark-mode .template-dropdown {
+    background-color: #1a3c28;
+    color: #a5d6a7;
+    border-color: #2e7d32;
+}
+
 /* Edição em Linha Restaurada */
 .editable-cell { transition: background-color 0.2s, outline 0.2s; border-radius: 4px; min-height: 20px; }
 .editable-cell:hover { background-color: rgba(128, 128, 128, 0.1); cursor: text; }

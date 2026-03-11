@@ -36,13 +36,20 @@
             </div>
         </div>
         
-        <div class="shortcuts-bar">
-            <span class="shortcut-label">⚡ Templates:</span>
-            <button type="button" class="btn-shortcut" onclick="applyTemplate('Loja entrou em contato informando PDV Travado.', 'Foi necessário reconfigurar PDV via linha de comando (config.sh). Equipamento voltou a funcionar normalmente.')">PDV Travado</button>
-            <button type="button" class="btn-shortcut" onclick="applyTemplate('Loja entrou em contato informando que todos os PDVs estão com erro ao resgatar vendas.', 'Ajustado ao iniciar serviço responsável pelo resgate no servidor da loja. Resgates normalizados.')">Erro Resgate</button>
-            <button type="button" class="btn-shortcut" onclick="applyTemplate('Todas as pré vendas com erro de conexão com as bases', 'Ajustado ao acessar servidor da loja e reiniciar bases. Acesso normalizado em todas as pré vendas')">Erro Conexão PV</button>
-            <button type="button" class="btn-shortcut" onclick="applyTemplate('Loja entrou em contato solicitando senha de acesso ao Portal Nexoh', 'Loja encaminhada ao time de NOC para ajuste')">Senha Nexoh</button>
-            <button type="button" class="btn-shortcut" onclick="applyTemplate('Contato referente a instabilidade no pagamento via PIX.', 'Loja orientada sobre a instabilidade geral. Solicitado clicar em \'Voltar\' para estornar o valor e aguardar a correção. Em caso de falha no estorno, a orientação é acionar o time do Financeiro diretamente.')">Instabilidade PIX</button>
+       <div class="shortcuts-bar">
+            <span class="shortcut-label">⚡ Templates Rápidos:</span>
+            <select class="template-dropdown" onchange="if(this.selectedIndex > 0) { applyTemplate(this.options[this.selectedIndex].dataset.prob, this.options[this.selectedIndex].dataset.sol); this.selectedIndex = 0; }">
+                <option value="">Selecione um atendimento...</option>
+                <option data-prob="Loja entrou em contato informando PDV Travado." data-sol="Foi necessário reconfigurar PDV via linha de comando (config.sh). Equipamento voltou a funcionar normalmente.">PDV Travado</option>
+                <option data-prob="Loja entrou em contato informando que todos os PDVs estão com erro ao resgatar vendas." data-sol="Ajustado ao iniciar serviço responsável pelo resgate no servidor da loja. Resgates normalizados.">Resgate Venda - Erro</option>
+                <option data-prob="Todas as pré vendas com erro de conexão com as bases." data-sol="Ajustado ao acessar servidor da loja e reiniciar bases. Acesso normalizado em todas as pré vendas.">Erro Conexão PV</option>
+                <option data-prob="Loja entrou em contato solicitando senha de acesso ao Portal Nexoh." data-sol="Loja encaminhada ao time de NOC para ajuste.">Senha Nexoh</option>
+                <option data-prob="Contato referente a instabilidade no pagamento via PIX." data-sol="Loja orientada sobre a instabilidade geral. Solicitado clicar em 'Voltar' para estornar o valor e aguardar a correção. Em caso de falha no estorno, a orientação é acionar o time do Financeiro diretamente.">Instabilidade PIX</option>
+                <option data-prob="Loja entrou em contato informando estar sem internet." data-sol="Validado e loja realmente está sem internet. Solicitado para filial entrar em contato com o setor de NOC via WhatsApp.">Loja Sem Internet</option>
+                <option data-prob="Em meio ao atendimento, ligação acabou caindo." data-sol="Em meio ao atendimento, ligação acabou caindo.">Ligação Caiu</option>
+                <option data-prob="Filial entrou em contato, porém acabou desistindo." data-sol="Realizada tentativa de callback, porém caiu na caixa postal.">Callback</option>
+                <option data-prob="Loja com problema ao acessar e-mail." data-sol="Realizada tentativa de acesso com senhas salvas, porém sem sucesso. Encaminhado para o time de NOC.">Acesso Email - NOC</option>
+            </select>
         </div>
 
         <form id="ticketForm" class="form-group">
