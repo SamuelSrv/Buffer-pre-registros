@@ -190,38 +190,28 @@ document.getElementById('filial').addEventListener('input', function(e) {
 
 document.getElementById('pdv').addEventListener('input', function(e) {
     this.value = this.value.replace(/\D/g, ''); 
-    // Limpa o estado de erro assim que o usuário volta a digitar
-    this.classList.remove('input-error');
-    const tooltip = document.getElementById('pdv-error-tooltip');
-    if(tooltip) tooltip.style.display = 'none';
+    // Limpa o balão de erro nativo assim que o usuário volta a digitar
+    this.setCustomValidity(""); 
 });
 
-// --- SALVAMENTO COM VALIDAÇÃO ---
+// --- SALVAMENTO COM VALIDAÇÃO NATIVA ---
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const pdvInput = document.getElementById('pdv');
     const pdvValor = pdvInput.value;
-    const tooltipIcon = document.getElementById('pdv-error-tooltip');
 
-    // Nova Trava Visual de segurança do PDV (Substitui o alert)
+    // Reseta qualquer erro prévio para fazer a nova checagem
+    pdvInput.setCustomValidity("");
+
+    // Se preencheu o PDV, OBRIGATORIAMENTE tem que ter 2 números
     if (pdvValor !== "" && pdvValor.length !== 2) {
-        pdvInput.classList.add('input-error', 'shake');
-        if(tooltipIcon) tooltipIcon.style.display = 'block';
-        
-        // Remove a classe de tremor após a animação, para poder tremer de novo se errar 2x
-        setTimeout(() => {
-            pdvInput.classList.remove('shake');
-        }, 500);
-
-        pdvInput.focus();
-        return; // Interrompe o código aqui
+        pdvInput.setCustomValidity("PDV Inválido! Digite exatamente 2 números (ex: 01).");
+        pdvInput.reportValidity(); // Dispara o balãozinho nativo do navegador
+        return; // Interrompe o código aqui e não salva
     }
 
-    // Se passou na validação, garante que está sem erro visual
-    pdvInput.classList.remove('input-error');
-    if(tooltipIcon) tooltipIcon.style.display = 'none';
-
+    // Se chegou aqui, está tudo certo. Salva o registro!
     tickets.unshift({
         filial: document.getElementById('filial').value,
         acionamento: document.getElementById('acionamento').value,
@@ -321,28 +311,23 @@ const versiculos = [
 
 function atualizarVersiculo() {
     const verseElement = document.getElementById('bible-verse');
-    if (!verseElement) return; // Garante que a página carregou a tag HTML
+    if (!verseElement) return; 
     
     const agora = Date.now();
-    const duasHorasEmMilisegundos = 2 * 60 * 60 * 1000; // 2 horas de trava
+    const duasHorasEmMilisegundos = 2 * 60 * 60 * 1000; 
 
-    // Busca na memória do navegador se já tem um versículo salvo e a validade dele
     let versiculoSalvo = localStorage.getItem('currentVerse');
     let validade = localStorage.getItem('verseExpiration');
 
-    // Se não tiver versículo, ou se a validade (2h) já expirou, sorteia um novo
     if (!versiculoSalvo || !validade || agora > validade) {
         const randomIndex = Math.floor(Math.random() * versiculos.length);
         versiculoSalvo = versiculos[randomIndex];
 
-        // Salva o novo versículo e define a próxima troca para daqui a 2 horas
         localStorage.setItem('currentVerse', versiculoSalvo);
         localStorage.setItem('verseExpiration', agora + duasHorasEmMilisegundos);
     }
 
-    // Escreve na tela
     verseElement.innerText = versiculoSalvo;
 }
 
-// Inicia a função assim que a página carrega
 atualizarVersiculo();
