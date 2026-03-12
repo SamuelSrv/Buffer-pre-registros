@@ -15,8 +15,8 @@ async function formatarRegistro() {
     if (!rascunho) return alert("Cole um texto no rascunho primeiro.");
 
     btnGenerate.disabled = true;
-    btnGenerate.innerHTML = '⏳ Processando na IA...';
-    outputField.value = 'Aguarde, conectando ao modelo Gemini...';
+    btnGenerate.innerHTML = '⏳ Processando com IA...';
+    outputField.value = 'Aguarde...';
 
     // Lógica de Saudação Local
     const agora = new Date();
