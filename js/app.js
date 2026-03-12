@@ -206,7 +206,7 @@ form.addEventListener('submit', (e) => {
 
     // Se preencheu o PDV, OBRIGATORIAMENTE tem que ter 2 números
     if (pdvValor !== "" && pdvValor.length !== 2) {
-        pdvInput.setCustomValidity("PDV Inválido! Digite exatamente 2 números (ex: 01).");
+        pdvInput.setCustomValidity("PDV Inválido!");
         pdvInput.reportValidity(); // Dispara o balãozinho nativo do navegador
         return; // Interrompe o código aqui e não salva
     }
