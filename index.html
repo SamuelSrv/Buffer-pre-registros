@@ -91,9 +91,12 @@
                     <label for="solucao">Solução Aplicada</label>
                     <input type="text" id="solucao" placeholder="O que foi feito...">
                 </div>
-                <div class="input-group input-filial-group">
+                <div class="input-group input-filial-group" style="position: relative;">
                     <label for="pdv">PDV</label>
                     <input type="text" id="pdv" placeholder="Ex: 01" maxlength="2">
+                    <span id="pdv-error-tooltip" class="error-tooltip">!
+                        <span class="tooltip-text">PDV INVÁLIDO</span>
+                    </span>
                 </div>
                 <button type="submit" id="btnSalvar">Salvar (Enter)</button>
             </form>

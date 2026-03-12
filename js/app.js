@@ -184,35 +184,53 @@ tableBody.addEventListener('keydown', function (e) {
 
 // --- MÁSCARAS DE DIGITAÇÃO ---
 // Bloqueia letras e aceita apenas números em tempo real
-document.getElementById('filial').addEventListener('input', function (e) {
-    this.value = this.value.replace(/\D/g, '');
+document.getElementById('filial').addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, ''); 
 });
 
-document.getElementById('pdv').addEventListener('input', function (e) {
-    this.value = this.value.replace(/\D/g, '');
+document.getElementById('pdv').addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, ''); 
+    // Limpa o estado de erro assim que o usuário volta a digitar
+    this.classList.remove('input-error');
+    const tooltip = document.getElementById('pdv-error-tooltip');
+    if(tooltip) tooltip.style.display = 'none';
 });
 
 // --- SALVAMENTO COM VALIDAÇÃO ---
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const pdvInput = document.getElementById('pdv').value;
+    const pdvInput = document.getElementById('pdv');
+    const pdvValor = pdvInput.value;
+    const tooltipIcon = document.getElementById('pdv-error-tooltip');
 
-    // Trava de segurança do PDV
-    if (pdvInput !== "" && pdvInput.length !== 2) {
-        alert("⚠️ PDV Inválido!\n\nPor favor, digite exatamente 2 números.\nSe for o PDV 1, digite '01'.");
-        document.getElementById('pdv').focus();
-        return; // Interrompe o código aqui e não salva
+    // Nova Trava Visual de segurança do PDV (Substitui o alert)
+    if (pdvValor !== "" && pdvValor.length !== 2) {
+        pdvInput.classList.add('input-error', 'shake');
+        if(tooltipIcon) tooltipIcon.style.display = 'block';
+        
+        // Remove a classe de tremor após a animação, para poder tremer de novo se errar 2x
+        setTimeout(() => {
+            pdvInput.classList.remove('shake');
+        }, 500);
+
+        pdvInput.focus();
+        return; // Interrompe o código aqui
     }
+
+    // Se passou na validação, garante que está sem erro visual
+    pdvInput.classList.remove('input-error');
+    if(tooltipIcon) tooltipIcon.style.display = 'none';
 
     tickets.unshift({
         filial: document.getElementById('filial').value,
         acionamento: document.getElementById('acionamento').value,
-        pdv: pdvInput,
+        pdv: pdvValor,
         problema: document.getElementById('problema').value,
         solucao: document.getElementById('solucao').value,
         registrado: false
     });
+    
     localStorage.setItem('tickets', JSON.stringify(tickets));
     renderTable();
     form.reset();
@@ -304,7 +322,7 @@ const versiculos = [
 function atualizarVersiculo() {
     const verseElement = document.getElementById('bible-verse');
     if (!verseElement) return; // Garante que a página carregou a tag HTML
-
+    
     const agora = Date.now();
     const duasHorasEmMilisegundos = 2 * 60 * 60 * 1000; // 2 horas de trava
 
