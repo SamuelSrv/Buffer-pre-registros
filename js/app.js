@@ -6,7 +6,7 @@ function switchTab(tabId) {
     event.currentTarget.classList.add('active');
 }
 
-// --- LÓGICA DO FORMATADOR IA (MOTOR ATIVADO) ---
+// --- LÓGICA DO FORMATADOR IA (Aba Aprimorar) ---
 async function formatarRegistro() {
     const btnGenerate = document.querySelector('.btn-ai-generate');
     const outputField = document.getElementById('finalOutput');
@@ -61,82 +61,6 @@ async function formatarRegistro() {
     } finally {
         btnGenerate.disabled = false;
         btnGenerate.innerHTML = '<span style="margin-right: 5px;">🪄</span> Aplicar Padrão Lebes';
-    }
-}
-
-// --- LÓGICA DA VARINHA MÁGICA (DIRETO NO FORMULÁRIO) ---
-async function aprimorarCamposIA() {
-    const inputProb = document.getElementById('problema');
-    const inputSol = document.getElementById('solucao');
-    const btnMagica = document.getElementById('btnAprimorarCampos');
-
-    let prob = inputProb.value.trim();
-    let sol = inputSol.value.trim();
-
-    if (!prob && !sol) {
-        alert("⚠️ Escreva algo no Problema ou na Solução para a IA aprimorar.");
-        return;
-    }
-
-    // Muda o ícone para indicar que está pensando
-    btnMagica.disabled = true;
-    btnMagica.innerHTML = '⏳';
-
-    const prompt = `
-        Atue como um analista de Service Desk sênior.
-        Reescreva este log de chamado de forma clara, técnica e objetiva. Corrija a gramática e os erros de digitação.
-        
-        Problema: "${prob}"
-        Solução: "${sol}"
-        
-        Regras rigorosas:
-        1. Não adicione saudações ou explicações, apenas melhore o texto.
-        2. Se a Solução original estiver vazia, deixe a SOLUCAO em branco.
-        3. Retorne a resposta EXATAMENTE neste formato (não use markdown):
-        PROBLEMA: <texto aprimorado do problema>
-        SOLUCAO: <texto aprimorado da solução>
-    `;
-
-    try {
-        const response = await fetch('/.netlify/functions/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
-        });
-
-        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
-
-        const data = await response.json();
-        const textoResposta = data.text.trim();
-
-        if (textoResposta.includes("PROBLEMA:") && textoResposta.includes("SOLUCAO:")) {
-            const partes = textoResposta.split("SOLUCAO:");
-            const novoProblema = partes[0].replace("PROBLEMA:", "").trim();
-            const novaSolucao = partes[1].trim();
-
-            if (novoProblema) inputProb.value = novoProblema;
-            if (novaSolucao && novaSolucao !== '""' && novaSolucao !== "''") {
-                inputSol.value = novaSolucao;
-            }
-        } else {
-            console.error("Formato inesperado da IA:", textoResposta);
-            alert("A IA retornou um formato inesperado. Tente novamente.");
-        }
-
-    } catch (error) {
-        console.error('Erro de Integração IA:', error);
-        alert("Erro ao conectar com a Inteligência Artificial.");
-    } finally {
-        btnMagica.disabled = false;
-        btnMagica.innerHTML = '🪄';
-        
-        const bgColor = document.body.classList.contains('dark-mode') ? '#1a3c28' : '#d4edda';
-        inputProb.style.backgroundColor = bgColor;
-        inputSol.style.backgroundColor = bgColor;
-        setTimeout(() => {
-            inputProb.style.backgroundColor = '';
-            inputSol.style.backgroundColor = '';
-        }, 500);
     }
 }
 
@@ -206,6 +130,74 @@ function updateDashboard() {
     document.getElementById('countFone').innerText = tickets.filter(t => t.acionamento === 'Telefone').length;
 }
 
+// --- FUNÇÃO PARA APRIMORAR LINHA ESPECÍFICA DA TABELA ---
+async function aprimorarLinha(index) {
+    const ticket = tickets[index];
+
+    if (!ticket.problema.trim() && !ticket.solucao.trim()) return;
+
+    // Pega o botão específico que foi clicado e muda para "Pensando"
+    const botoesMagicos = document.querySelectorAll('.btn-magic');
+    const currentBtn = botoesMagicos[index];
+    const originalIcon = currentBtn.innerHTML;
+    currentBtn.innerHTML = '⏳';
+    currentBtn.disabled = true;
+
+    const prompt = `
+        Atue como um analista de Service Desk sênior.
+        Reescreva este log de chamado de forma clara, técnica e objetiva. Corrija a gramática e os erros de digitação.
+        
+        Problema: "${ticket.problema}"
+        Solução: "${ticket.solucao}"
+        
+        Regras rigorosas:
+        1. Não adicione saudações ou explicações, apenas melhore o texto.
+        2. Se a Solução original estiver vazia, deixe a SOLUCAO em branco.
+        3. Retorne a resposta EXATAMENTE neste formato (não use markdown):
+        PROBLEMA: <texto aprimorado do problema>
+        SOLUCAO: <texto aprimorado da solução>
+    `;
+
+    try {
+        const response = await fetch('/.netlify/functions/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+
+        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+
+        const data = await response.json();
+        const textoResposta = data.text.trim();
+
+        if (textoResposta.includes("PROBLEMA:") && textoResposta.includes("SOLUCAO:")) {
+            const partes = textoResposta.split("SOLUCAO:");
+            const novoProblema = partes[0].replace("PROBLEMA:", "").trim();
+            const novaSolucao = partes[1].trim();
+
+            if (novoProblema) tickets[index].problema = novoProblema;
+            if (novaSolucao && novaSolucao !== '""' && novaSolucao !== "''") {
+                tickets[index].solucao = novaSolucao;
+            }
+            
+            // Salva as alterações da IA e atualiza a tabela
+            localStorage.setItem('tickets', JSON.stringify(tickets));
+            renderTable();
+        } else {
+            console.error("Formato inesperado da IA:", textoResposta);
+            alert("A IA retornou um formato inesperado. Tente novamente.");
+            currentBtn.innerHTML = originalIcon;
+            currentBtn.disabled = false;
+        }
+
+    } catch (error) {
+        console.error('Erro de Integração IA:', error);
+        alert("Erro ao conectar com a Inteligência Artificial.");
+        currentBtn.innerHTML = originalIcon;
+        currentBtn.disabled = false;
+    }
+}
+
 function renderTable() {
     tableBody.innerHTML = '';
     tickets.forEach((ticket, index) => {
@@ -221,6 +213,7 @@ function renderTable() {
             <td class="editable-cell" data-index="${index}" data-field="pdv" contenteditable="true" title="Clique para editar">${ticket.pdv || ''}</td>
             <td style="text-align: center;">${statusBadge}</td>
             <td class="actions-cell">
+                <button class="btn-action btn-magic" onclick="aprimorarLinha(${index})" title="Aprimorar com IA">🪄</button>
                 <button class="btn-action btn-copy" onclick="copyToClipboard(${index})">Copiar</button>
                 <button class="btn-action btn-ok" onclick="toggleStatus(${index})">✓</button>
                 <button class="btn-action btn-delete" onclick="deleteTicket(${index})">✕</button>
@@ -278,7 +271,7 @@ form.addEventListener('submit', (e) => {
     pdvInput.setCustomValidity("");
 
     if (pdvValor !== "" && pdvValor.length !== 2) {
-        pdvInput.setCustomValidity("PDV Inválido!");
+        pdvInput.setCustomValidity("PDV Inválido! Digite exatamente 2 números (ex: 01).");
         pdvInput.reportValidity(); 
         return; 
     }
