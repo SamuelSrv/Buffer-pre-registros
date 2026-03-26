@@ -28,16 +28,18 @@ async function formatarRegistro() {
     if (tempoDecimal >= 7.00 && tempoDecimal <= 12.00) saudacao = "Bom dia,";
     else if (tempoDecimal > 12.00 && tempoDecimal <= 19.00) saudacao = "Boa tarde,";
 
+    // PROMPT ATUALIZADO: Foco em Loja/Filial
     const prompt = `
         Você é um assistente de comunicação corporativa do Suporte de TI.
-        Aprimore o seguinte rascunho de mensagem para o usuário final:
+        Aprimore o seguinte rascunho de mensagem de atendimento:
         "${rascunho}"
 
         Regras estritas:
         1. Corrija a gramática e deixe o tom profissional e educado.
         2. NÃO inicie com saudações (exclua qualquer olá, bom dia, boa tarde).
         3. NÃO adicione assinaturas ou despedidas no final.
-        4. Retorne APENAS o corpo principal da mensagem corrigida.
+        4. NUNCA use as palavras "usuário", "cliente" ou pessoas específicas. Refira-se sempre a quem entrou em contato como "Loja" ou "Filial".
+        5. Retorne APENAS o corpo principal da mensagem corrigida.
     `;
 
     try {
@@ -143,6 +145,7 @@ async function aprimorarLinha(index) {
     currentBtn.innerHTML = '⏳';
     currentBtn.disabled = true;
 
+    // PROMPT ATUALIZADO: Foco em Loja/Filial
     const prompt = `
         Atue como um analista de Service Desk sênior.
         Reescreva este log de chamado de forma clara, técnica e objetiva. Corrija a gramática e os erros de digitação.
@@ -153,7 +156,8 @@ async function aprimorarLinha(index) {
         Regras rigorosas:
         1. Não adicione saudações ou explicações, apenas melhore o texto.
         2. Se a Solução original estiver vazia, deixe a SOLUCAO em branco.
-        3. Retorne a resposta EXATAMENTE neste formato (não use markdown):
+        3. NUNCA use as palavras "usuário", "cliente" ou pessoa específica. Refira-se a quem relatou o problema sempre como "Loja" ou "Filial" (ex: "Loja informa...", "Filial relata...").
+        4. Retorne a resposta EXATAMENTE neste formato (não use markdown):
         PROBLEMA: <texto aprimorado do problema>
         SOLUCAO: <texto aprimorado da solução>
     `;
@@ -404,13 +408,13 @@ atualizarVersiculo();
 
 
 // --- LÓGICA DO MODAL DE NOVIDADES ---
-// Quando quiser mostrar o modal novamente no futuro, basta mudar 'v1.0' para 'v2.0', por exemplo.
 const CURRENT_VERSION = 'v1.0'; 
 
 function checkNewsModal() {
     const savedVersion = localStorage.getItem('appVersion');
     if (savedVersion !== CURRENT_VERSION) {
-        document.getElementById('newsModal').style.display = 'flex';
+        const modal = document.getElementById('newsModal');
+        if (modal) modal.style.display = 'flex';
     }
 }
 
@@ -419,8 +423,8 @@ function closeNewsModal() {
     if (dontShow) {
         localStorage.setItem('appVersion', CURRENT_VERSION);
     }
-    document.getElementById('newsModal').style.display = 'none';
+    const modal = document.getElementById('newsModal');
+    if (modal) modal.style.display = 'none';
 }
 
-// Pequeno delay para a tela carregar antes de mostrar o modal
 setTimeout(checkNewsModal, 500);
