@@ -95,7 +95,11 @@
                     <label for="pdv">PDV</label>
                     <input type="text" id="pdv" placeholder="Ex: 01" maxlength="2">
                 </div>
-                <button type="submit" id="btnSalvar">Salvar (Enter)</button>
+                
+                <div style="display: flex; gap: 10px; margin-top: auto; height: 45px;">
+                    <button type="button" id="btnAprimorarCampos" onclick="aprimorarCamposIA()" title="Aprimorar Problema e Solução com IA" class="btn-varinha">🪄</button>
+                    <button type="submit" id="btnSalvar" style="height: 100%; margin: 0;">Salvar (Enter)</button>
+                </div>
             </form>
 
             <div class="dashboard-stats">

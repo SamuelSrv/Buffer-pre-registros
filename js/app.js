@@ -64,6 +64,82 @@ async function formatarRegistro() {
     }
 }
 
+// --- LÓGICA DA VARINHA MÁGICA (DIRETO NO FORMULÁRIO) ---
+async function aprimorarCamposIA() {
+    const inputProb = document.getElementById('problema');
+    const inputSol = document.getElementById('solucao');
+    const btnMagica = document.getElementById('btnAprimorarCampos');
+
+    let prob = inputProb.value.trim();
+    let sol = inputSol.value.trim();
+
+    if (!prob && !sol) {
+        alert("⚠️ Escreva algo no Problema ou na Solução para a IA aprimorar.");
+        return;
+    }
+
+    // Muda o ícone para indicar que está pensando
+    btnMagica.disabled = true;
+    btnMagica.innerHTML = '⏳';
+
+    const prompt = `
+        Atue como um analista de Service Desk sênior.
+        Reescreva este log de chamado de forma clara, técnica e objetiva. Corrija a gramática e os erros de digitação.
+        
+        Problema: "${prob}"
+        Solução: "${sol}"
+        
+        Regras rigorosas:
+        1. Não adicione saudações ou explicações, apenas melhore o texto.
+        2. Se a Solução original estiver vazia, deixe a SOLUCAO em branco.
+        3. Retorne a resposta EXATAMENTE neste formato (não use markdown):
+        PROBLEMA: <texto aprimorado do problema>
+        SOLUCAO: <texto aprimorado da solução>
+    `;
+
+    try {
+        const response = await fetch('/.netlify/functions/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+
+        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+
+        const data = await response.json();
+        const textoResposta = data.text.trim();
+
+        if (textoResposta.includes("PROBLEMA:") && textoResposta.includes("SOLUCAO:")) {
+            const partes = textoResposta.split("SOLUCAO:");
+            const novoProblema = partes[0].replace("PROBLEMA:", "").trim();
+            const novaSolucao = partes[1].trim();
+
+            if (novoProblema) inputProb.value = novoProblema;
+            if (novaSolucao && novaSolucao !== '""' && novaSolucao !== "''") {
+                inputSol.value = novaSolucao;
+            }
+        } else {
+            console.error("Formato inesperado da IA:", textoResposta);
+            alert("A IA retornou um formato inesperado. Tente novamente.");
+        }
+
+    } catch (error) {
+        console.error('Erro de Integração IA:', error);
+        alert("Erro ao conectar com a Inteligência Artificial.");
+    } finally {
+        btnMagica.disabled = false;
+        btnMagica.innerHTML = '🪄';
+        
+        const bgColor = document.body.classList.contains('dark-mode') ? '#1a3c28' : '#d4edda';
+        inputProb.style.backgroundColor = bgColor;
+        inputSol.style.backgroundColor = bgColor;
+        setTimeout(() => {
+            inputProb.style.backgroundColor = '';
+            inputSol.style.backgroundColor = '';
+        }, 500);
+    }
+}
+
 function copiarAprimorado() {
     const texto = document.getElementById('finalOutput').value;
     if (!texto || texto.startsWith("ERRO") || texto.startsWith("Aguarde")) return;
@@ -183,14 +259,12 @@ tableBody.addEventListener('keydown', function (e) {
 });
 
 // --- MÁSCARAS DE DIGITAÇÃO ---
-// Bloqueia letras e aceita apenas números em tempo real
 document.getElementById('filial').addEventListener('input', function(e) {
     this.value = this.value.replace(/\D/g, ''); 
 });
 
 document.getElementById('pdv').addEventListener('input', function(e) {
     this.value = this.value.replace(/\D/g, ''); 
-    // Limpa o balão de erro nativo assim que o usuário volta a digitar
     this.setCustomValidity(""); 
 });
 
@@ -201,17 +275,14 @@ form.addEventListener('submit', (e) => {
     const pdvInput = document.getElementById('pdv');
     const pdvValor = pdvInput.value;
 
-    // Reseta qualquer erro prévio para fazer a nova checagem
     pdvInput.setCustomValidity("");
 
-    // Se preencheu o PDV, OBRIGATORIAMENTE tem que ter 2 números
     if (pdvValor !== "" && pdvValor.length !== 2) {
         pdvInput.setCustomValidity("PDV Inválido!");
-        pdvInput.reportValidity(); // Dispara o balãozinho nativo do navegador
-        return; // Interrompe o código aqui e não salva
+        pdvInput.reportValidity(); 
+        return; 
     }
 
-    // Se chegou aqui, está tudo certo. Salva o registro!
     tickets.unshift({
         filial: document.getElementById('filial').value,
         acionamento: document.getElementById('acionamento').value,
@@ -284,7 +355,6 @@ function exportToCSV() {
     document.body.removeChild(link);
 }
 
-// Inicializa a tabela
 renderTable();
 
 // --- LÓGICA DO RODAPÉ (VERSÍCULOS) ---
