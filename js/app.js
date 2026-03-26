@@ -180,7 +180,10 @@ async function aprimorarLinha(index) {
                 tickets[index].solucao = novaSolucao;
             }
             
-            // Salva as alterações da IA e atualiza a tabela
+            // Marca o chamado como já aprimorado para travar o botão
+            tickets[index].aprimorado = true;
+
+            // Salva as alterações e atualiza a tabela
             localStorage.setItem('tickets', JSON.stringify(tickets));
             renderTable();
         } else {
@@ -205,6 +208,9 @@ function renderTable() {
         if (ticket.registrado) tr.classList.add('registrado');
         const statusBadge = ticket.registrado ? '<span class="status-badge status-ok">OK</span>' : '<span class="status-badge status-pendente">Pendente</span>';
 
+        // Lógica para desabilitar o botão se já foi aprimorado
+        const disableMagic = ticket.aprimorado ? 'disabled title="Já aprimorado"' : 'title="Aprimorar com IA"';
+
         tr.innerHTML = `
             <td style="font-weight: bold;">${ticket.filial}</td>
             <td>${ticket.acionamento}</td>
@@ -213,7 +219,7 @@ function renderTable() {
             <td class="editable-cell" data-index="${index}" data-field="pdv" contenteditable="true" title="Clique para editar">${ticket.pdv || ''}</td>
             <td style="text-align: center;">${statusBadge}</td>
             <td class="actions-cell">
-                <button class="btn-action btn-magic" onclick="aprimorarLinha(${index})" title="Aprimorar com IA">🪄</button>
+                <button class="btn-action btn-magic" onclick="aprimorarLinha(${index})" ${disableMagic}>🪄</button>
                 <button class="btn-action btn-copy" onclick="copyToClipboard(${index})">Copiar</button>
                 <button class="btn-action btn-ok" onclick="toggleStatus(${index})">✓</button>
                 <button class="btn-action btn-delete" onclick="deleteTicket(${index})">✕</button>
@@ -282,7 +288,8 @@ form.addEventListener('submit', (e) => {
         pdv: pdvValor,
         problema: document.getElementById('problema').value,
         solucao: document.getElementById('solucao').value,
-        registrado: false
+        registrado: false,
+        aprimorado: false // Flag para o botão mágico nascer ativado
     });
     
     localStorage.setItem('tickets', JSON.stringify(tickets));
@@ -394,3 +401,26 @@ function atualizarVersiculo() {
 }
 
 atualizarVersiculo();
+
+
+// --- LÓGICA DO MODAL DE NOVIDADES ---
+// Quando quiser mostrar o modal novamente no futuro, basta mudar 'v1.0' para 'v2.0', por exemplo.
+const CURRENT_VERSION = 'v1.0'; 
+
+function checkNewsModal() {
+    const savedVersion = localStorage.getItem('appVersion');
+    if (savedVersion !== CURRENT_VERSION) {
+        document.getElementById('newsModal').style.display = 'flex';
+    }
+}
+
+function closeNewsModal() {
+    const dontShow = document.getElementById('chkDontShowAgain').checked;
+    if (dontShow) {
+        localStorage.setItem('appVersion', CURRENT_VERSION);
+    }
+    document.getElementById('newsModal').style.display = 'none';
+}
+
+// Pequeno delay para a tela carregar antes de mostrar o modal
+setTimeout(checkNewsModal, 500);

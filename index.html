@@ -23,6 +23,26 @@
         <button id="themeToggle" title="Alternar Tema">🌙</button>
     </header>
 
+    <div id="newsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🚀 Novidades do Sistema</h3>
+                <button class="close-modal" onclick="closeNewsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <h4>Nova Função: Varinha Mágica 🪄</h4>
+                <p>Agora você pode aprimorar seus chamados diretamente na tabela usando nossa Inteligência Artificial! Basta clicar no botão roxo ao lado do chamado.</p>
+                <p class="warning-text">⚠️ <strong>Função em teste!</strong> Por favor, sempre leia e valide o texto gerado pela IA antes de copiá-lo para o sistema oficial.</p>
+            </div>
+            <div class="modal-footer">
+                <label>
+                    <input type="checkbox" id="chkDontShowAgain" checked> Não mostrar novamente
+                </label>
+                <button class="btn-primary" onclick="closeNewsModal()">Entendi</button>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
 
         <section id="buffer" class="page-section active">
